@@ -5,7 +5,7 @@ A collection of reusable agent skills compatible with the [skills](https://www.n
 ## Install
 
 ```bash
-npx skills add erezrokah/skills
+npx skills@1.4.9 add erezrokah/skills
 ```
 
 ## Available Skills
