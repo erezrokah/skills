@@ -27,6 +27,22 @@ Before running any checks, detect the repository characteristics. Use Glob and G
 | `.github/PULL_REQUEST_TEMPLATE.md` OR `.github/PULL_REQUEST_TEMPLATE/` | `has-pr-template` |
 | `Dockerfile` OR `docker-compose.yml` OR `docker-compose.yaml` | `docker` |
 
+**Fallback detection via PR history:** Some repos use Dependabot or Renovate with default configuration (enabled via GitHub settings UI) without committing a config file. To catch these:
+
+- If `dependabot` was **not** detected from the table above, run:
+  ```
+  gh pr list --author 'app/dependabot' --state all --limit 1
+  ```
+  If at least one PR is returned, set category flag `dependabot-pr-only`.
+
+- If `renovate` was **not** detected from the table above, run:
+  ```
+  gh pr list --author 'app/renovate' --state all --limit 1
+  ```
+  If at least one PR is returned, set category flag `renovate-pr-only`.
+
+Use `--state all` to catch both open and closed/merged PRs. Use `--limit 1` for efficiency — only one PR is needed to confirm the tool is in use. Only run these `gh` commands when the corresponding config-file detection found nothing.
+
 ## Phase 2: Audit Checks
 
 Run every applicable check. Assign each finding a severity:
@@ -43,15 +59,23 @@ Run every applicable check. Assign each finding a severity:
 
 Every dependency should specify an exact version, not a range. Ranges allow silent adoption of compromised releases.
 
+**However**, version ranges are acceptable when **both** of these conditions are met:
+1. A lockfile is committed (`pnpm-lock.yaml`, `yarn.lock`, `package-lock.json` for JS; `uv.lock` for Python) — ensures reproducible installs
+2. A minimum release age / cooldown is configured (Dependabot `cooldown`, Renovate `minimumReleaseAge`, pnpm `minimum-release-age`, or uv `exclude-newer`) — prevents auto-adopting freshly published compromised versions
+
+When both conditions are met, **downgrade** range findings to **PASS** for that ecosystem — the lockfile pins the actual resolved version and the release age gate blocks rapid exploitation. If only one condition is met, flag as normal.
+
 **JS repos** — check all `package.json` files (root + workspace packages):
 - Flag versions starting with `^`, `~`, `>=`, `>`, `*`, or `latest` in `dependencies` and `devDependencies`
 - Exact versions look like `"1.2.3"` (no prefix)
 - **Do NOT flag** pnpm/yarn workspace protocol references (`workspace:*`, `workspace:^`, etc.) — these resolve internally
+- **Do NOT flag** if a lockfile (`pnpm-lock.yaml`, `yarn.lock`, or `package-lock.json`) is committed **and** a release age gate is configured (see checks D, F, G)
 - Severity: HIGH for `dependencies`, MEDIUM for `devDependencies`
 
 **Python repos** — check `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`:
 - Flag `>=`, `~=`, `>`, `!=`, `*`, or bare package names without `==`
 - Exact pins: `package==1.2.3`
+- **Do NOT flag** if `uv.lock` is committed **and** `exclude-newer` is configured (see check E)
 - Severity: HIGH
 
 **Rust repos** — check `Cargo.toml`:
@@ -77,6 +101,13 @@ Search `.github/workflows/*.yml`, `.github/workflows/*.yaml`, and `.github/actio
 - **CRITICAL:** `uses: some-org/some-action@main` (mutable branch)
 
 A comment after the SHA showing the tag is fine and encouraged for readability.
+
+**Renovate auto-pinning:** If `renovate` or `renovate-pr-only` is detected, recommend adding the [`helpers:pinGitHubActionDigests`](https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests) preset to the Renovate config. This makes Renovate automatically pin GitHub Actions to SHA digests and keep them updated:
+```json
+{
+  "extends": ["helpers:pinGitHubActionDigests"]
+}
+```
 
 ### C: Dangerous Workflow Triggers
 
@@ -118,7 +149,14 @@ Reference: https://docs.astral.sh/uv/reference/settings/#exclude-newer
 
 ### F: Dependabot Cooldown
 
-**Applies to:** `dependabot`
+**Applies to:** `dependabot` OR `dependabot-pr-only`
+
+**If `dependabot-pr-only`** (detected via PR history, no config file):
+- Report that Dependabot is actively used in this repository (PRs exist) but no `.github/dependabot.yml` configuration file was found. This means Dependabot is running with fully default settings — no cooldown period, no custom grouping, no version filtering.
+- **HIGH** severity
+- **Fix:** Create a `.github/dependabot.yml` file with explicit configuration including a `cooldown` setting.
+
+**If `dependabot`** (config file exists):
 
 Check `.github/dependabot.yml` for `cooldown` within each `updates` entry:
 
@@ -136,7 +174,14 @@ Reference: https://docs.github.com/en/code-security/reference/supply-chain-secur
 
 ### G: Renovate Minimum Release Age
 
-**Applies to:** `renovate`
+**Applies to:** `renovate` OR `renovate-pr-only`
+
+**If `renovate-pr-only`** (detected via PR history, no config file):
+- Report that Renovate is actively used in this repository (PRs exist) but no Renovate configuration file was found (`renovate.json`, `renovate.json5`, `.renovaterc`, `.renovaterc.json`, or `renovate` key in `package.json`). This means Renovate is running with fully default preset — no minimum release age, no custom package rules.
+- **HIGH** severity
+- **Fix:** Create a `renovate.json` file with explicit configuration including `minimumReleaseAge` and the [`helpers:pinGitHubActionDigests`](https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests) preset for automatic GitHub Actions SHA pinning.
+
+**If `renovate`** (config file exists):
 
 Check `renovate.json`, `renovate.json5`, `.renovaterc`, `.renovaterc.json`, or `renovate` key in `package.json` for:
 
@@ -144,7 +189,10 @@ Check `renovate.json`, `renovate.json5`, `.renovaterc`, `.renovaterc.json`, or `
    - **HIGH** if missing
    - **MEDIUM** if less than 3 days
 
-Reference: https://docs.renovatebot.com/key-concepts/minimum-release-age/
+2. **`helpers:pinGitHubActionDigests`** in the `extends` array — automatically pins GitHub Actions to SHA digests and keeps them updated
+   - **MEDIUM** if missing (when `github-actions` category is also detected)
+
+Reference: https://docs.renovatebot.com/key-concepts/minimum-release-age/ , https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests
 
 ### H: Docker Image Pinning
 
