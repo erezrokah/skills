@@ -69,9 +69,9 @@ The `actions/` org actions must still be pinned — no namespace is inherently s
 
 **Applies to:** `js-pnpm`
 
-Check `.npmrc` and `package.json` under `pnpm`:
-1. **`minimum-release-age`** (`.npmrc`) / **`minimumReleaseAge`** (`package.json`) — recommended `3` or `7` days. **HIGH** if missing.
-2. **`block-exotic-subdeps`** (`.npmrc`) / **`blockExoticSubdeps`** (`package.json`) — **MEDIUM** if missing.
+Check `.npmrc` and workspace-root `package.json` under `pnpm.settings`:
+1. **`minimum-release-age`** (`.npmrc`) / **[`minimumReleaseAge`](https://pnpm.io/settings#minimumreleaseage)** (workspace `package.json`) — recommended `3` or `7` days. **HIGH** if missing.
+2. **`block-exotic-subdeps`** (`.npmrc`) / **[`blockExoticSubdeps`](https://pnpm.io/settings#blockexoticsubdeps)** (workspace `package.json`) — **MEDIUM** if missing.
 
 ### E: uv Supply Chain Protections
 
