@@ -35,7 +35,7 @@ Severity levels: **CRITICAL** (actively exploitable) · **HIGH** (one step from 
 
 **Applies to:** all repo types with dependencies
 
-**Exception — downgrade to PASS** when **both**: (1) a lockfile is committed, AND (2) a minimum release age / cooldown is configured (Dependabot `cooldown`, Renovate `minimumReleaseAge`, pnpm `minimum-release-age`, or uv `exclude-newer`). If only one condition is met, flag as normal.
+**Exception — downgrade to PASS** when **both**: (1) a lockfile is committed, AND (2) a minimum release age / cooldown is configured (Dependabot [`cooldown`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-), Renovate [`minimumReleaseAge`](https://docs.renovatebot.com/configuration-options/#minimumreleaseage), pnpm [`minimumReleaseAge`](https://pnpm.io/settings#minimumreleaseage), or uv [`exclude-newer`](https://docs.astral.sh/uv/reference/settings/#exclude-newer)). If only one condition is met, flag as normal.
 
 **JS** — check all `package.json` files (root + workspace packages). Flag `^`, `~`, `>=`, `>`, `*`, `latest` in `dependencies` (HIGH) and `devDependencies` (MEDIUM). Do NOT flag `workspace:*`/`workspace:^`/`workspace:~` references.
 
@@ -77,15 +77,15 @@ Check `pnpm-workspace.yaml`:
 
 **Applies to:** `python-uv`
 
-Check `pyproject.toml` `[tool.uv]` and `uv.toml` for **`exclude-newer`** (RFC 3339 datetime). **MEDIUM** if missing. **LOW** if present but older than 90 days.
+Check `pyproject.toml` `[tool.uv]` and `uv.toml` for **[`exclude-newer`](https://docs.astral.sh/uv/reference/settings/#exclude-newer)** (RFC 3339 datetime). **MEDIUM** if missing. **LOW** if present but older than 90 days.
 
-### F: Dependabot Cooldown
+### F: Dependabot Cooldown ([docs](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-))
 
 **Applies to:** `dependabot` OR `dependabot-pr-only`
 
 If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `.github/dependabot.yml` with [`cooldown`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-) setting.
 
-If `dependabot`: check each `updates` entry for [`cooldown.default`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
+If `dependabot`: check each `updates` entry for [`cooldown.default-days`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
 
 ### G: Renovate Minimum Release Age
 
