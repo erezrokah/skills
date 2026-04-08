@@ -35,7 +35,7 @@ Severity levels: **CRITICAL** (actively exploitable) · **HIGH** (one step from 
 
 **Applies to:** all repo types with dependencies
 
-**Exception — downgrade to PASS** when **both**: (1) a lockfile is committed, AND (2) a minimum release age / cooldown is configured (Dependabot `cooldown`, Renovate `minimumReleaseAge`, pnpm `minimum-release-age`, or uv `exclude-newer`). If only one condition is met, flag as normal.
+**Exception — downgrade to PASS** when **both**: (1) a lockfile is committed, AND (2) a minimum release age / cooldown is configured (Dependabot [`cooldown`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-), Renovate [`minimumReleaseAge`](https://docs.renovatebot.com/configuration-options/#minimumreleaseage), pnpm [`minimumReleaseAge`](https://pnpm.io/settings#minimumreleaseage), or uv `exclude-newer`). If only one condition is met, flag as normal.
 
 **JS** — check all `package.json` files (root + workspace packages). Flag `^`, `~`, `>=`, `>`, `*`, `latest` in `dependencies` (HIGH) and `devDependencies` (MEDIUM). Do NOT flag `workspace:*`/`workspace:^`/`workspace:~` references.
 
