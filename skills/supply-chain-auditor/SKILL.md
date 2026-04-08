@@ -79,13 +79,13 @@ Check `pnpm-workspace.yaml`:
 
 Check `pyproject.toml` `[tool.uv]` and `uv.toml` for **`exclude-newer`** (RFC 3339 datetime). **MEDIUM** if missing. **LOW** if present but older than 90 days.
 
-### F: Dependabot Cooldown
+### F: Dependabot Cooldown ([docs](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-))
 
 **Applies to:** `dependabot` OR `dependabot-pr-only`
 
 If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `.github/dependabot.yml` with [`cooldown`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-) setting.
 
-If `dependabot`: check each `updates` entry for [`cooldown.default`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
+If `dependabot`: check each `updates` entry for [`cooldown.default-days`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
 
 ### G: Renovate Minimum Release Age
 
