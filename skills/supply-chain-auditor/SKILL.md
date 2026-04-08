@@ -85,7 +85,7 @@ Check `pyproject.toml` `[tool.uv]` and `uv.toml` for **`exclude-newer`** (RFC 33
 
 If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `.github/dependabot.yml` with `cooldown` setting.
 
-If `dependabot`: check each `updates` entry for `cooldown.default`. **HIGH** if missing, **MEDIUM** if < 3 days.
+If `dependabot`: check each `updates` entry for `cooldown.default-days`. **HIGH** if missing, **MEDIUM** if < 3 days.
 
 ### G: Renovate Minimum Release Age
 
