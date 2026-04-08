@@ -83,19 +83,19 @@ Check `pyproject.toml` `[tool.uv]` and `uv.toml` for **`exclude-newer`** (RFC 33
 
 **Applies to:** `dependabot` OR `dependabot-pr-only`
 
-If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `.github/dependabot.yml` with `cooldown` setting.
+If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `.github/dependabot.yml` with [`cooldown`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-) setting.
 
-If `dependabot`: check each `updates` entry for `cooldown.default`. **HIGH** if missing, **MEDIUM** if < 3 days.
+If `dependabot`: check each `updates` entry for [`cooldown.default`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
 
 ### G: Renovate Minimum Release Age
 
 **Applies to:** `renovate` OR `renovate-pr-only`
 
-If `renovate-pr-only`: **HIGH** — no config file found, recommend creating `renovate.json` with `minimumReleaseAge` and `helpers:pinGitHubActionDigests` preset.
+If `renovate-pr-only`: **HIGH** — no config file found, recommend creating `renovate.json` with [`minimumReleaseAge`](https://docs.renovatebot.com/configuration-options/#minimumreleaseage) and [`helpers:pinGitHubActionDigests`](https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests) preset.
 
 If `renovate`: check config files for:
-1. **`minimumReleaseAge`** (top-level or in `packageRules`) — **HIGH** if missing, **MEDIUM** if < 3 days.
-2. **`helpers:pinGitHubActionDigests`** in `extends` — **MEDIUM** if missing (when `github-actions` also detected).
+1. **[`minimumReleaseAge`](https://docs.renovatebot.com/configuration-options/#minimumreleaseage)** (top-level or in `packageRules`) — **HIGH** if missing, **MEDIUM** if < 3 days.
+2. **[`helpers:pinGitHubActionDigests`](https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests)** in `extends` — **MEDIUM** if missing (when `github-actions` also detected).
 
 ### H: Docker Image Pinning
 
