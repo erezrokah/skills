@@ -68,18 +68,15 @@ Check `Dockerfile` and `docker-compose.yml`/`docker-compose.yaml`:
 
 #### 1.4: CI Lock File Usage
 
-**Applies to:** `github-actions` AND (`js` OR `python` OR `rust` OR `go`)
+**Applies to:** `github-actions` AND (`js` OR `python` OR `rust`)
 
 Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps for dependency install commands that bypass lockfiles:
 
 - `npm install` or `npm i` without using `ci` sub-command — **HIGH**. Fix: replace with `npm ci`.
 - `yarn install` without `--frozen-lockfile` or `--immutable` — **HIGH**. Fix: add `--frozen-lockfile` (Yarn v1) or `--immutable` (Yarn v2+).
 - `pnpm install` without `--frozen-lockfile` — **HIGH**. Fix: add `--frozen-lockfile`.
-- `pip install` with bare package names (not `-r requirements.txt`) — **HIGH**. Fix: pin with `==` version.
-- `npm install -g <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npm install -g package@1.2.3`).
 - `uv sync` without `--frozen` — **MEDIUM**. Fix: add `--frozen`.
 - `cargo install` without `--locked` — **MEDIUM**. Fix: add `--locked`.
-- `go install <package>@latest` or without version pin — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`).
 
 #### 1.5: Unpinned Dependencies in CI Commands
 
@@ -89,7 +86,8 @@ Scan `run:` steps in workflow files for commands that pull and execute unpinned 
 
 - `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npx package@1.2.3`). Recommend adding the tool as a `devDependency` and running via lockfile instead, since pinning the tool version does not pin its transitive dependencies.
 - `pip install <package>` without `==` version pin in a `run:` step — **HIGH**. Fix: pin with `==` (e.g., `pip install package==1.2.3`). Recommend adding to `requirements.txt` with hashes (`--require-hashes`) or using `uv` with a lockfile, since pinning does not pin transitive dependencies.
-- `go install <package>@latest` — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`). Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
+- `npm install -g <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npm install -g package@1.2.3`).
+- `go install <package>@latest` or without version pin — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`). Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
 - `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**. Fix: replace with a package manager, or at minimum download to a file, verify a checksum, then execute.
 
 ---
@@ -160,7 +158,7 @@ Produce a markdown report with:
 - **Category 3 — Dev Dependency Install (recommendations):** findings grouped by severity, each with: issue description, recommended action for the user to take
 - Passed checks list
 - Collapsible "Why This Matters" section with real-world supply chain attack examples (include links and CVEs):
-  - GitHub Actions: tj-actions/changed-files (CVE-2025-30066), reviewdog (CVE-2025-30154), Trivy (CVE-2026-33634), KICS, LiteLLM
+  - GitHub Actions: tj-actions/changed-files ([CVE-2025-30066](https://nvd.nist.gov/vuln/detail/CVE-2025-30066)), reviewdog ([CVE-2025-30154](https://nvd.nist.gov/vuln/detail/CVE-2025-30154)), Trivy ([CVE-2026-33634](https://nvd.nist.gov/vuln/detail/CVE-2026-33634)), KICS, LiteLLM
   - Package registries: event-stream (2018), ua-parser-js (2021), colors.js (2022), PyTorch torchtriton (2022)
 - Prioritized next steps, split into:
   - **Already fixed** — Category 1 items addressed in this PR
