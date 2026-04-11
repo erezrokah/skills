@@ -37,7 +37,7 @@ Severity levels: **CRITICAL** (actively exploitable) · **HIGH** (one step from 
 
 Findings in this category **MUST be fixed with actual code changes** committed in the PR branch.
 
-#### B: GitHub Actions SHA Pinning
+#### 1.1: GitHub Actions SHA Pinning
 
 **Applies to:** `github-actions`
 
@@ -48,7 +48,7 @@ Search `.github/workflows/*.yml`, `.github/workflows/*.yaml`, and `.github/actio
 
 The `actions/` org actions must still be pinned — no namespace is inherently safe.
 
-#### C: Dangerous Workflow Triggers
+#### 1.2: Dangerous Workflow Triggers
 
 **Applies to:** `github-actions`
 
@@ -57,7 +57,7 @@ The `actions/` org actions must still be pinned — no namespace is inherently s
 3. **`workflow_run`** — **MEDIUM** if it processes artifacts without validation.
 4. **`workflow_dispatch`** with `${{ github.event.inputs.* }}` interpolated in `run:` steps — **MEDIUM** (command injection).
 
-#### H: Docker Image Pinning
+#### 1.3: Docker Image Pinning
 
 **Applies to:** `docker`
 
@@ -66,7 +66,7 @@ Check `Dockerfile` and `docker-compose.yml`/`docker-compose.yaml`:
 - `FROM image:tag` without `@sha256:` digest — **MEDIUM**
 - `FROM image@sha256:...` — **PASS**
 
-#### I: CI Lock File Usage
+#### 1.4: CI Lock File Usage
 
 **Applies to:** `github-actions` AND (`js` OR `python` OR `rust` OR `go`)
 
@@ -81,7 +81,7 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 
 **Ignore** global tool installs (`npm install -g`, `pip install` in a clearly separate tool-setup step).
 
-#### J: Unpinned Dependencies in CI Commands
+#### 1.5: Unpinned Dependencies in CI Commands
 
 **Applies to:** `github-actions`
 
@@ -98,7 +98,7 @@ Scan `run:` steps in workflow files for commands that pull and execute unpinned 
 
 Findings in this category **MUST NOT be fixed with code changes**. Include them as actionable recommendations in the PR description.
 
-#### F: Dependabot Cooldown ([docs](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-))
+#### 2.1: Dependabot Cooldown ([docs](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-))
 
 **Applies to:** `dependabot` OR `dependabot-pr-only`
 
@@ -106,7 +106,7 @@ If `dependabot-pr-only`: **HIGH** — no config file found, recommend creating `
 
 If `dependabot`: check each `updates` entry for [`cooldown.default-days`](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown-). **HIGH** if missing, **MEDIUM** if < 3 days.
 
-#### G: Renovate Minimum Release Age
+#### 2.2: Renovate Minimum Release Age
 
 **Applies to:** `renovate` OR `renovate-pr-only`
 
@@ -122,7 +122,7 @@ If `renovate`: check config files for:
 
 Findings in this category **MUST NOT be fixed with code changes**. Include them as actionable recommendations in the PR description.
 
-#### A: Dependency Version Pinning
+#### 3.1: Dependency Version Pinning
 
 **Applies to:** all repo types with dependencies
 
@@ -136,7 +136,7 @@ Findings in this category **MUST NOT be fixed with code changes**. Include them 
 
 **Go** — flag if `go.sum` not committed. HIGH.
 
-#### D: pnpm Supply Chain Protections
+#### 3.2: pnpm Supply Chain Protections
 
 **Applies to:** `js-pnpm`
 
@@ -144,7 +144,7 @@ Check `pnpm-workspace.yaml`:
 1. **[`minimumReleaseAge`](https://pnpm.io/settings#minimumreleaseage)** — recommended `3` or `7` days. **HIGH** if missing.
 2. **[`blockExoticSubdeps`](https://pnpm.io/settings#blockexoticsubdeps)** — **MEDIUM** if missing.
 
-#### E: uv Supply Chain Protections
+#### 3.3: uv Supply Chain Protections
 
 **Applies to:** `python-uv`
 
@@ -182,11 +182,11 @@ Before creating a PR, check for existing supply-chain hardening PRs:
 Check for a PR template (`.github/PULL_REQUEST_TEMPLATE.md` or `.github/PULL_REQUEST_TEMPLATE/`) and follow it if present. Title: `security: Harden supply chain <area>`.
 
 **Code changes (Category 1 only):** Create a branch and commit fixes for all Category 1 findings:
-- Pin GitHub Actions to SHA digests (Check B)
-- Fix dangerous workflow triggers (Check C)
-- Pin Docker images to SHA digests (Check H)
-- Add `--frozen-lockfile` / `--locked` / `ci` flags to CI install commands (Check I)
-- Pin or remove unpinned CI dependency references (Check J)
+- Pin GitHub Actions to SHA digests (1.1)
+- Fix dangerous workflow triggers (1.2)
+- Pin Docker images to SHA digests (1.3)
+- Add `--frozen-lockfile` / `--locked` / `ci` flags to CI install commands (1.4)
+- Pin or remove unpinned CI dependency references (1.5)
 
 **PR description structure:**
 
@@ -200,15 +200,15 @@ Brief description of supply chain hardening changes.
 ## Recommendations — Automatic Dependency Updates
 > These items require manual follow-up and are NOT included as code changes in this PR.
 
-- [ ] [Check F] ...
-- [ ] [Check G] ...
+- [ ] [2.1] ...
+- [ ] [2.2] ...
 
 ## Recommendations — Dev Dependency Install Protections
 > These items require manual follow-up and are NOT included as code changes in this PR.
 
-- [ ] [Check A] ...
-- [ ] [Check D] ...
-- [ ] [Check E] ...
+- [ ] [3.1] ...
+- [ ] [3.2] ...
+- [ ] [3.3] ...
 ```
 
 Only include recommendation sections that have findings. Use checkboxes so users can track follow-up.
@@ -219,4 +219,4 @@ Only include recommendation sections that have findings. Use checkboxes so users
 - When suggesting SHA pinning, look up the actual SHA using `gh api repos/{owner}/{repo}/git/ref/tags/{tag}`. **Do not invent SHAs.**
 - For monorepos, check all `package.json` files, not just root.
 - Always include exact file paths and line numbers in findings.
-- When fixing CI install commands (Check I), preserve existing flags — only append the lockfile flag if missing.
+- When fixing CI install commands (1.4), preserve existing flags — only append the lockfile flag if missing.
