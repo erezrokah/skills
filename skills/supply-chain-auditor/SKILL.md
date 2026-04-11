@@ -85,11 +85,13 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 
 **Applies to:** `github-actions`
 
-Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time:
+Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time.
 
-- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version AND recommend using a lockfile instead, since pinning the tool version does not pin its dependencies.
+For all items below: pin the exact version AND recommend using a lockfile instead, since pinning the tool version does not pin its transitive dependencies.
+
+- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**
 - `pip install <package>` without `==` version pin in a `run:` step — **HIGH**
-- `go install <package>@latest` — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`).
+- `go install <package>@latest` — **HIGH**
 - `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**
 
 ---
