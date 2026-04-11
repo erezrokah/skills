@@ -159,7 +159,7 @@ Produce a markdown report with:
 - Passed checks list
 - Collapsible "Why This Matters" section with real-world supply chain attack examples (include links and CVEs):
   - GitHub Actions: tj-actions/changed-files ([CVE-2025-30066](https://nvd.nist.gov/vuln/detail/CVE-2025-30066)), reviewdog ([CVE-2025-30154](https://nvd.nist.gov/vuln/detail/CVE-2025-30154)), Trivy ([CVE-2026-33634](https://nvd.nist.gov/vuln/detail/CVE-2026-33634)), KICS, LiteLLM
-  - Package registries: event-stream (2018), ua-parser-js (2021), colors.js (2022), PyTorch torchtriton (2022)
+  - Package registries: event-stream (2018), ua-parser-js (2021), colors.js (2022), PyTorch torchtriton (2022), [Axios npm compromise impacting OpenAI](https://openai.com/index/axios-developer-tool-compromise/) (2026)
 - Prioritized next steps, split into:
   - **Already fixed** — Category 1 items addressed in this PR
   - **Follow-up actions** — Category 2 and 3 items for the user to address
