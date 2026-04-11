@@ -75,11 +75,11 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 - `npm install` or `npm i` without using `ci` sub-command — **HIGH**. Fix: replace with `npm ci`.
 - `yarn install` without `--frozen-lockfile` or `--immutable` — **HIGH**. Fix: add `--frozen-lockfile` (Yarn v1) or `--immutable` (Yarn v2+).
 - `pnpm install` without `--frozen-lockfile` — **HIGH**. Fix: add `--frozen-lockfile`.
-- `pip install` with bare package names (not `-r requirements.txt`) — **MEDIUM**. Flag bare `pip install <package>` in CI.
+- `pip install` with bare package names (not `-r requirements.txt`) — **HIGH**. Fix: pin with `==` version.
+- `npm install -g <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npm install -g package@1.2.3`).
 - `uv sync` without `--frozen` — **MEDIUM**. Fix: add `--frozen`.
 - `cargo install` without `--locked` — **MEDIUM**. Fix: add `--locked`.
-
-**Ignore** global tool installs (`npm install -g`, `pip install` in a clearly separate tool-setup step).
+- `go install <package>@latest` or without version pin — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`).
 
 #### 1.5: Unpinned Dependencies in CI Commands
 
@@ -87,9 +87,9 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 
 Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time:
 
-- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**
-- `pip install <package>` without `==` version pin in a `run:` step — **MEDIUM**
-- `go install <package>@latest` — **MEDIUM**
+- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version AND recommend using a lockfile instead, since pinning the tool version does not pin its dependencies.
+- `pip install <package>` without `==` version pin in a `run:` step — **HIGH**
+- `go install <package>@latest` — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`).
 - `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**
 
 ---
