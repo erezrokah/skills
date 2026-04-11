@@ -87,7 +87,7 @@ Scan `run:` steps in workflow files for commands that pull and execute unpinned 
 - `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npx package@1.2.3`). Recommend adding the tool as a `devDependency` and running via lockfile instead, since pinning the tool version does not pin its transitive dependencies.
 - `pip install <package>` without `==` version pin in a `run:` step — **HIGH**. Fix: pin with `==` (e.g., `pip install package==1.2.3`). Recommend adding to `requirements.txt` with hashes (`--require-hashes`) or using `uv` with a lockfile, since pinning does not pin transitive dependencies.
 - `npm install -g <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npm install -g package@1.2.3`).
-- `go install <package>@latest` or without version pin — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`). Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
+- `go install <package>@latest` — **HIGH**. Fix: pin to an exact version (e.g., `go install package@v1.2.3`). Treat bare `go install <package>` (no `@version` suffix) as a finding only when it runs outside the repo module context; in module-aware mode a bare `go install` resolves from the current module's `go.mod`/`go.sum` and is not unpinned. Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
 - `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**. Fix: replace with a package manager, or at minimum download to a file, verify a checksum, then execute.
 
 ---
