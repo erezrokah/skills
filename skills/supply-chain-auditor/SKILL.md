@@ -85,14 +85,12 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 
 **Applies to:** `github-actions`
 
-Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time.
+Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time:
 
-For all items below: pin the exact version AND recommend using a lockfile instead, since pinning the tool version does not pin its transitive dependencies.
-
-- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**
-- `pip install <package>` without `==` version pin in a `run:` step — **HIGH**
-- `go install <package>@latest` — **HIGH**
-- `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**
+- `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npx package@1.2.3`). Recommend adding the tool as a `devDependency` and running via lockfile instead, since pinning the tool version does not pin its transitive dependencies.
+- `pip install <package>` without `==` version pin in a `run:` step — **HIGH**. Fix: pin with `==` (e.g., `pip install package==1.2.3`). Recommend adding to `requirements.txt` with hashes (`--require-hashes`) or using `uv` with a lockfile, since pinning does not pin transitive dependencies.
+- `go install <package>@latest` — **HIGH**. Fix: pin to exact version (e.g., `go install package@v1.2.3`). Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
+- `curl ... | sh` or `wget ... | sh` (piped installs) — **CRITICAL**. Fix: replace with a package manager, or at minimum download to a file, verify a checksum, then execute.
 
 ---
 
