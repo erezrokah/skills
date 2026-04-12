@@ -15,6 +15,7 @@ Detect repository characteristics using Glob and Grep. Record which categories a
 | `pnpm-lock.yaml` OR `pnpm-workspace.yaml` | `js-pnpm` |
 | `yarn.lock` | `js-yarn` |
 | `package-lock.json` | `js-npm` |
+| `bun.lock` OR `bun.lockb` | `js-bun` |
 | `pyproject.toml` OR `requirements.txt` OR `setup.py` | `python` |
 | `uv.lock` OR `[tool.uv]` in `pyproject.toml` | `python-uv` |
 | `Cargo.toml` | `rust` |
@@ -75,6 +76,7 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 - `npm install` or `npm i` without using `ci` sub-command — **HIGH**. Fix: replace with `npm ci`.
 - `yarn install` (Yarn v1 / Classic) without `--frozen-lockfile` — **HIGH**. Fix: add `--frozen-lockfile`. Note: Yarn v2+ (Berry) defaults to immutable installs in CI via `enableImmutableInstalls`, so `yarn install` without `--immutable` is **PASS** when using Yarn v2+.
 - `pnpm install` without `--frozen-lockfile` — **PASS**. pnpm defaults to `--frozen-lockfile` when the `CI` environment variable is set (as in GitHub Actions). Adding the flag explicitly is acceptable for clarity but not required.
+- `bun install` or `bun i` without using `ci` sub-command — **HIGH**. Fix: replace with `bun ci`.
 - `uv sync` without `--frozen` — **MEDIUM**. Fix: add `--frozen`.
 - `cargo install` without `--locked` — **MEDIUM**. Fix: add `--locked`.
 
@@ -85,6 +87,7 @@ Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps f
 Scan `run:` steps in workflow files for commands that pull and execute unpinned packages at CI time:
 
 - `npx <package>@latest` or `npx <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npx package@1.2.3`). Recommend adding the tool as a `devDependency` and running via lockfile instead, since pinning the tool version does not pin its transitive dependencies.
+- `bunx <package>@latest` or `bunx <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `bunx package@1.2.3`). Recommend adding the tool as a `devDependency` and running via lockfile instead, since pinning the tool version does not pin its transitive dependencies.
 - `pip install <package>` without `==` version pin in a `run:` step — **HIGH**. Fix: pin with `==` (e.g., `pip install package==1.2.3`). Recommend adding to `requirements.txt` with hashes (`--require-hashes`) or using `uv` with a lockfile, since pinning does not pin transitive dependencies.
 - `npm install -g <package>` without version pin — **HIGH**. Fix: pin exact version (e.g., `npm install -g package@1.2.3`).
 - `go install <package>@latest` — **HIGH**. Fix: pin to an exact version (e.g., `go install package@v1.2.3`). Treat bare `go install <package>` (no `@version` suffix) as a finding only when it runs outside the repo module context; in module-aware mode a bare `go install` resolves from the current module's `go.mod`/`go.sum` and is not unpinned. Note: `go install` always builds from source with the module's `go.sum`, so transitive dependencies are already verified.
