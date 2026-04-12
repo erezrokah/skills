@@ -73,8 +73,8 @@ Check `Dockerfile` and `docker-compose.yml`/`docker-compose.yaml`:
 Scan all `.github/workflows/*.yml` and `.github/workflows/*.yaml` `run:` steps for dependency install commands that bypass lockfiles:
 
 - `npm install` or `npm i` without using `ci` sub-command — **HIGH**. Fix: replace with `npm ci`.
-- `yarn install` without `--frozen-lockfile` or `--immutable` — **HIGH**. Fix: add `--frozen-lockfile` (Yarn v1) or `--immutable` (Yarn v2+).
-- `pnpm install` without `--frozen-lockfile` — **HIGH**. Fix: add `--frozen-lockfile`.
+- `yarn install` (Yarn v1 / Classic) without `--frozen-lockfile` — **HIGH**. Fix: add `--frozen-lockfile`. Note: Yarn v2+ (Berry) defaults to immutable installs in CI via `enableImmutableInstalls`, so `yarn install` without `--immutable` is **PASS** when using Yarn v2+.
+- `pnpm install` without `--frozen-lockfile` — **PASS**. pnpm defaults to `--frozen-lockfile` when the `CI` environment variable is set (as in GitHub Actions). Adding the flag explicitly is acceptable for clarity but not required.
 - `uv sync` without `--frozen` — **MEDIUM**. Fix: add `--frozen`.
 - `cargo install` without `--locked` — **MEDIUM**. Fix: add `--locked`.
 
